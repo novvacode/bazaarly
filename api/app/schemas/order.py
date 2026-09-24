@@ -72,6 +72,12 @@ class PaymentParamsOut(Schema):
     prefill: dict[str, str] = Field(default_factory=dict)
 
 
+class PaymentVerifyIn(Schema):
+    razorpay_order_id: Annotated[str, StringConstraints(min_length=1, max_length=64)]
+    razorpay_payment_id: Annotated[str, StringConstraints(min_length=1, max_length=64)]
+    razorpay_signature: Annotated[str, StringConstraints(min_length=1, max_length=128)]
+
+
 class PublicOrderBrief(Schema):
     code: int
     public_token: str

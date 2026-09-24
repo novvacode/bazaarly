@@ -110,6 +110,7 @@ export type PublicBusiness = {
   delivery_areas: string[];
   min_order_paise: number;
   delivery_fee_paise: number;
+  accepts_online_payments: boolean;
 };
 
 export type StorefrontOut = {

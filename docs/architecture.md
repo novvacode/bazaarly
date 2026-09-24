@@ -99,3 +99,41 @@ exits; anything unfinished is recovered by another worker through `XAUTOCLAIM`.
 **Observability.** `GET /admin/jobs/stats` (stream length, `XPENDING`, delayed and dead
 counts, consumers with idle times, `bz:stats` counters) and the dead-letter list with retry and
 delete, all shown on `/admin`.
+
+## Order placement and online payment
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant C as Customer browser
+    participant W as Next.js
+    participant A as API
+    participant P as Postgres
+    participant R as Razorpay
+    participant Q as Worker
+
+    C->>W: Checkout (idempotency_key generated on mount)
+    W->>A: POST /public/b/{slug}/orders
+    A->>P: one tx: order (pending_payment), items, status event,<br/>outbox: orders.expire_unpaid (+30 min)
+    A->>R: POST /v1/orders (amount, receipt, notes)
+    A->>P: payments row (created)
+    A-->>C: order + checkout params
+    C->>R: Razorpay Checkout (UPI / card)
+    R-->>C: order_id, payment_id, signature
+    par browser callback
+        C->>A: POST /public/orders/{token}/payment/verify
+        A->>A: HMAC(order_id|payment_id) constant-time check
+        A->>P: mark_paid (idempotent)
+    and webhook
+        R->>A: POST /webhooks/razorpay (raw body + signature)
+        A->>P: webhook_events insert (dedupe on event id) + outbox job
+        Q->>P: payments.process_webhook → mark_paid (idempotent)
+    end
+    Note over A,P: mark_paid: UPDATE payments SET status='paid'<br/>WHERE provider_order_id=… AND status<>'paid' RETURNING …<br/>only the winner moves the order to placed and enqueues emails
+    Q->>R: 30 min later: orders.expire_unpaid checks /orders/{id}/payments<br/>captured → mark_paid, otherwise cancel
+```
+
+A resubmit with the same idempotency key returns the same order and the same Razorpay order.
+If Razorpay is down when the order is created, the API answers 502, the order stays
+`pending_payment`, and a retry (or the "Pay now" button on the tracking page) creates the
+provider order then.

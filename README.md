@@ -61,6 +61,20 @@ make migration m="add foo"
 Backend tests need Postgres and Redis running (`make up`); they use a separate `bazaarly_test`
 database and Redis DB 15, so they never touch your dev data.
 
+## Online payments locally (optional)
+
+Online payments use Razorpay **test mode**. Set `RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`
+and `RAZORPAY_WEBHOOK_SECRET` in `.env`. Without them the storefront offers cash on
+delivery only.
+
+To receive webhooks on your machine, expose the API with a tunnel and point a Razorpay test
+webhook (events `payment.captured`, `payment.failed`, `order.paid`) at it:
+
+```bash
+cloudflared tunnel --url http://localhost:3000
+# webhook URL: https://<random>.trycloudflare.com/api/v1/webhooks/razorpay
+```
+
 ## Repository layout
 
 ```

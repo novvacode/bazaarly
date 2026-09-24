@@ -18,6 +18,7 @@ class PublicBusiness(Schema):
     delivery_areas: list[str]
     min_order_paise: int
     delivery_fee_paise: int
+    accepts_online_payments: bool = False
 
 
 class PublicItem(Schema):

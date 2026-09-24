@@ -839,12 +839,12 @@ Tick boxes as you go. Each phase ends with green `make test` and `make lint`, up
 - [x] `docs/architecture.md` section describing the queue with a diagram; `DECISIONS.md` "why not Celery".
 
 ### Phase 5 — Online payments
-- [ ] Payments and webhook_events tables; Razorpay client (httpx).
-- [ ] Online order creation → Razorpay order; checkout integration on web (Razorpay Checkout script); verify endpoint.
-- [ ] Webhook endpoint with raw-body signature verification and dedupe; `payments.process_webhook` handler; `orders.expire_unpaid` with provider check.
-- [ ] Idempotent `mark_paid` convergence point.
-- [ ] Tests: signatures (valid/invalid/tampered), duplicate webhooks, verify + webhook race (concurrent), expiry skips paid orders.
-- [ ] Sequence diagram for order + payment in `docs/architecture.md`; known-limitation note on merchant payouts in `DECISIONS.md`.
+- [x] Payments and webhook_events tables; Razorpay client (httpx).
+- [x] Online order creation → Razorpay order; checkout integration on web (Razorpay Checkout script); verify endpoint.
+- [x] Webhook endpoint with raw-body signature verification and dedupe; `payments.process_webhook` handler; `orders.expire_unpaid` with provider check.
+- [x] Idempotent `mark_paid` convergence point.
+- [x] Tests: signatures (valid/invalid/tampered), duplicate webhooks, verify + webhook race (concurrent), expiry skips paid orders.
+- [x] Sequence diagram for order + payment in `docs/architecture.md`; known-limitation note on merchant payouts in `DECISIONS.md`.
 
 ### Phase 6 — AI assistant
 - [ ] kb_chunks and assistant_logs tables with HNSW index.

@@ -138,3 +138,28 @@ messages end up visible on `/admin` instead of looping.
 **Context.** Tests must never call real providers (SPEC §19). **Decision.** `EMAIL_PROVIDER`
 also accepts `memory`, used by tests; local development uses SMTP to Mailpit as specified.
 **Consequence.** Handler tests assert on rendered subject, text and escaped HTML.
+
+### D-021 Platform-level Razorpay keys (known limitation)
+**Context.** SPEC §11 scopes the MVP to Razorpay test mode with the platform's own keys.
+**Decision.** All online payments go to one Razorpay account; `notes` carry `tenant_id` and
+`order_id`. **Consequence.** Real payouts to each merchant (Razorpay Route or per-merchant
+keys) are out of scope (§25); going live needs one of those before real money flows.
+
+### D-022 Payment params endpoint for retries
+**Context.** A failed or abandoned payment leaves the order `pending_payment` so the customer
+can retry until expiry (§11), but the tracking page needs Checkout parameters to retry.
+**Decision.** Add `GET /public/orders/{token}/payment`, returning the existing Razorpay order's
+params (creating it if the first attempt failed); 409 once the order no longer needs payment.
+**Consequence.** The tracking page shows "Pay now" while payment is pending.
+
+### D-023 Storefront advertises whether online payment is available
+**Context.** Online payment requires Razorpay keys; local setups usually have none.
+**Decision.** `PublicBusiness.accepts_online_payments` is true only when keys are configured;
+checkout disables the option otherwise, and the API rejects `payment_method=online` with 422.
+**Consequence.** Local development works end to end with cash on delivery.
+
+### D-024 Webhook processing is marked done only after its effect commits
+**Context.** A handler that set `processed_at` before calling `mark_paid` could lose the payment
+if the worker crashed in between. **Decision.** Apply the effect first (idempotent), then set
+`processed_at` in a separate update. **Consequence.** Crashes cause a harmless re-run, never a
+lost payment.

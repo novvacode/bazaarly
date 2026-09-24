@@ -28,7 +28,7 @@ import type {
 import { cn } from "@/lib/utils";
 
 import { useCart, type CartLine } from "./cart";
-import { payOnline, onlinePaymentsEnabled } from "./razorpay";
+import { payOnline } from "./razorpay";
 import { QtyStepper } from "./storefront";
 
 type Details = {
@@ -184,7 +184,11 @@ export function Checkout({ slug }: { slug: string }) {
       }
       cart.clear();
       if (out.payment) {
-        await payOnline(out, details);
+        const outcome = await payOnline(out).catch((e: unknown) => {
+          toast.error(errorMessage(e));
+          return "failed" as const;
+        });
+        if (outcome === "paid") toast.success("Payment received — thank you!");
       }
       router.replace(`/o/${out.order.public_token}`);
     },
@@ -432,8 +436,8 @@ export function Checkout({ slug }: { slug: string }) {
                 {
                   value: "online",
                   label: "Pay online",
-                  hint: onlinePaymentsEnabled() ? "UPI, cards, netbanking" : "Coming soon",
-                  disabled: !onlinePaymentsEnabled(),
+                  hint: b.accepts_online_payments ? "UPI, cards, netbanking" : "Not available",
+                  disabled: !b.accepts_online_payments,
                 },
               ]}
             />

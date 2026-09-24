@@ -204,14 +204,6 @@ async def test_phone_normalisation(client: AsyncClient, raw: str, ok: bool) -> N
         assert res.json()["error"]["code"] == "PHONE_INVALID"
 
 
-async def test_online_payment_not_available_yet(client: AsyncClient) -> None:
-    owner, cake, _ = await _shop(client)
-    res = await client.post(
-        f"/api/v1/public/b/{owner.slug}/orders", json=order_body([cake], payment_method="online")
-    )
-    assert res.status_code == 422
-
-
 # --- Idempotency and concurrency ---------------------------------------------------------------
 
 

@@ -7,6 +7,7 @@ import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core import errors
+from app.integrations.razorpay import online_payments_configured
 from app.models.tenant import Tenant
 from app.redis import get_redis
 from app.repositories import menu as menu_repo
@@ -60,7 +61,10 @@ async def build_storefront(session: AsyncSession, tenant: Tenant) -> StorefrontO
     ]
     if by_category.get(None):
         out.append(PublicCategory(id=None, name=UNCATEGORIZED, items=by_category[None]))
-    return StorefrontOut(business=PublicBusiness.model_validate(tenant), categories=out)
+    business = PublicBusiness.model_validate(tenant).model_copy(
+        update={"accepts_online_payments": online_payments_configured()}
+    )
+    return StorefrontOut(business=business, categories=out)
 
 
 async def get_storefront(session: AsyncSession, slug: str) -> StorefrontOut:

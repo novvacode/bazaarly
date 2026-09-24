@@ -288,10 +288,8 @@ async def create_order(
         return await _created_response(session, existing), False
 
     log.info("order_created", order_id=str(order.id), code=order.code, total=order.total_paise)
-    if status == OrderStatus.pending_payment:
-        from app.services import payments
-
-        await payments.start_online_payment(session, order, tenant)
+    # For online orders this also creates the Razorpay order (502 if the provider fails; the
+    # order then stays pending_payment and a resubmit with the same key retries it).
     return await _created_response(session, order), True
 
 

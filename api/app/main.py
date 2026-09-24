@@ -15,7 +15,7 @@ from app.core.middleware import RequestContextMiddleware
 from app.core.sentry import init_sentry
 from app.db import dispose_engine
 from app.redis import close_redis
-from app.routers import admin, auth, health, menu, orders, public, tenant
+from app.routers import admin, auth, health, menu, orders, public, tenant, webhooks
 
 API_PREFIX = "/api/v1"
 
@@ -45,7 +45,7 @@ def create_app() -> FastAPI:
     # prefix so the web app can reach them through its /api rewrite.
     app.include_router(health.router)
     app.include_router(health.router, prefix=API_PREFIX)
-    for module in (auth, tenant, menu, orders, public, admin):
+    for module in (auth, tenant, menu, orders, public, admin, webhooks):
         app.include_router(module.router, prefix=API_PREFIX)
 
     if settings.cors_origin_list and not settings.is_production:

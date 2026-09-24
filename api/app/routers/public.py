@@ -6,9 +6,16 @@ from fastapi import APIRouter, Depends, Response, status
 
 from app.core.ratelimit import limit_by_ip
 from app.deps import SessionDep
-from app.schemas.order import OrderCreatedOut, OrderCreateIn, PublicOrderOut
+from app.schemas.order import (
+    OrderCreatedOut,
+    OrderCreateIn,
+    PaymentParamsOut,
+    PaymentVerifyIn,
+    PublicOrderOut,
+)
 from app.schemas.public import StorefrontOut
 from app.services import orders as order_service
+from app.services import payments as payment_service
 from app.services import public as public_service
 
 router = APIRouter(prefix="/public", tags=["public"])
@@ -48,4 +55,33 @@ async def place_order(
     dependencies=[Depends(limit_by_ip("track_order", 60))],
 )
 async def track_order(public_token: str, session: SessionDep) -> PublicOrderOut:
+    return await order_service.public_order(session, public_token)
+
+
+@router.get(
+    "/orders/{public_token}/payment",
+    response_model=PaymentParamsOut,
+    summary="Razorpay Checkout parameters to (re)try paying an order awaiting payment",
+    dependencies=[Depends(limit_by_ip("payment_params", 20))],
+)
+async def payment_params(public_token: str, session: SessionDep) -> PaymentParamsOut:
+    return await payment_service.public_checkout_params(session, public_token)
+
+
+@router.post(
+    "/orders/{public_token}/payment/verify",
+    response_model=PublicOrderOut,
+    summary="Verify the Razorpay Checkout callback and mark the order paid",
+    dependencies=[Depends(limit_by_ip("payment_verify", 20))],
+)
+async def verify_payment(
+    public_token: str, data: PaymentVerifyIn, session: SessionDep
+) -> PublicOrderOut:
+    await payment_service.verify_checkout(
+        session,
+        public_token,
+        data.razorpay_order_id,
+        data.razorpay_payment_id,
+        data.razorpay_signature,
+    )
     return await order_service.public_order(session, public_token)
