@@ -1,0 +1,79 @@
+[project]
+name = "bazaarly-api"
+version = "0.1.0"
+description = "Bazaarly API and worker"
+requires-python = ">=3.12"
+dependencies = [
+    "alembic>=1.20.0",
+    "asyncpg>=0.31.0",
+    "fastapi>=0.141.1",
+    "pydantic[email]>=2.13.5",
+    "pydantic-settings>=2.15.0",
+    "sqlalchemy[asyncio]>=2.0.54",
+    "uvicorn[standard]>=0.53.0",
+    "structlog>=26.1.0",
+    "redis>=8.1.0",
+    "pyjwt>=2.15.0",
+    "argon2-cffi>=25.1.0",
+    "httpx>=0.28.1",
+    "boto3>=1.43.101",
+    "pillow>=12.3.0",
+    "jinja2>=3.1.6",
+    "python-multipart>=0.0.32",
+    "phonenumbers>=9.0.40",
+    "sentry-sdk>=2.70.0",
+    "fastembed>=0.8.1",
+    "pgvector>=0.5.0",
+    "anthropic>=1.8.0",
+]
+
+[dependency-groups]
+dev = [
+    "asgi-lifespan>=2.1.0",
+    "honcho>=2.0.0",
+    "mypy>=2.3.1",
+    "pip-audit>=2.10.1",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "pytest-cov>=7.1.0",
+    "respx>=0.23.1",
+    "ruff>=0.16.8",
+    "types-boto3>=1.43.101",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["alembic/versions"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "ASYNC", "C4", "SIM", "RUF", "PT", "BLE"]
+ignore = ["S101", "B008", "RUF012"]
+
+[tool.ruff.lint.per-file-ignores]
+"app/core/errors.py" = ["S105"]
+"tests/**" = ["S105", "S106", "S311", "PT011"]
+"evals/**" = ["S311"]
+"scripts/**" = ["S105", "S106", "S311"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+plugins = ["pydantic.mypy"]
+files = ["app"]
+
+[[tool.mypy.overrides]]
+module = ["fastembed.*", "pgvector.*", "phonenumbers.*", "asyncpg.*", "boto3.*", "botocore.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+testpaths = ["tests"]
+addopts = "-ra"
+filterwarnings = ["ignore::DeprecationWarning:passlib.*"]
+
+[tool.coverage.run]
+source = ["app"]
+omit = ["app/queue/worker.py"]
