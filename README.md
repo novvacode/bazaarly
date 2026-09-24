@@ -38,6 +38,17 @@ make dev
 | http://localhost:8025 | Mailpit (local email inbox) |
 | http://localhost:9001 | MinIO console (minioadmin / minioadmin) |
 
+### Demo accounts (after `make seed`)
+
+| Who | Email | Password |
+|---|---|---|
+| Platform admin | admin@example.com | admin-password-123 |
+| Demo Bakery owner / staff | bakery.owner@example.com / bakery.staff@example.com | demo-password-123 |
+| Demo Tiffin owner / staff | tiffin.owner@example.com / tiffin.staff@example.com | demo-password-123 |
+
+Storefronts: http://localhost:3000/b/demo-bakery and http://localhost:3000/b/demo-tiffin.
+The businesses are fictional.
+
 ## Common commands
 
 ```bash

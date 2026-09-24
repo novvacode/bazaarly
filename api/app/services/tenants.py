@@ -30,8 +30,7 @@ from app.schemas.tenant import (
     TenantPatch,
 )
 from app.services import auth as auth_service
-from app.services import membership_cache
-from app.services.hooks import on_tenant_changed
+from app.services import hooks, membership_cache, public
 
 INVITE_TTL = timedelta(days=7)
 
@@ -72,8 +71,9 @@ async def update_tenant(session: AsyncSession, ctx: TenantContext, patch: Tenant
             )
         values["phone"] = normalized
     await tenant_repo.update_fields(session, ctx, values)
-    await on_tenant_changed(session, ctx.tenant_id)
+    await hooks.tenant_changed(session, ctx.tenant_id)
     await session.commit()
+    await public.invalidate(ctx.tenant_id)
     tenant = await get_tenant(session, ctx)
     await session.refresh(tenant)
     return tenant
@@ -81,8 +81,9 @@ async def update_tenant(session: AsyncSession, ctx: TenantContext, patch: Tenant
 
 async def set_logo(session: AsyncSession, ctx: TenantContext, url: str) -> Tenant:
     await tenant_repo.update_fields(session, ctx, {"logo_url": url})
-    await on_tenant_changed(session, ctx.tenant_id)
+    await hooks.tenant_changed(session, ctx.tenant_id)
     await session.commit()
+    await public.invalidate(ctx.tenant_id)
     tenant = await get_tenant(session, ctx)
     await session.refresh(tenant)
     return tenant

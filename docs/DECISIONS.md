@@ -78,3 +78,21 @@ tests one-to-one. camelCase is still used for local variables and props.
 customers on public storefront pages, who never have a session. **Decision.** The refresh runs
 the first time a page that needs the session mounts (`useSession()`: dashboard, admin, auth
 pages, invites). **Consequence.** Storefront and tracking pages make no auth calls.
+
+### D-012 Storefront caching in two layers
+**Context.** SPEC §9.1/§14.2 ask for a cached public storefront and 60 s revalidation on the
+web. **Decision.** The API caches the storefront JSON per tenant in Redis for 60 s and deletes
+the key after any committed change to settings, menu or availability; slug → tenant id is cached
+separately (slugs are immutable). The Next.js page uses `revalidate = 60`. **Consequence.**
+Owners see changes on the API immediately; customers see them within a minute (ISR window).
+
+### D-013 Menu reorder within categories; moving between categories via edit
+**Context.** SPEC §14.1 asks for drag-to-reorder. **Decision.** Categories and the items inside
+each category are reordered by drag (dnd-kit, with keyboard support). Moving an item to another
+category is done from its edit dialog. The API's `/menu/reorder` still accepts cross-category
+moves. **Consequence.** Simpler, accessible drag interactions on mobile.
+
+### D-014 Public storefront shows only available items
+**Context.** SPEC §9.1 says the storefront returns "available, non-deleted items".
+**Decision.** Follow it literally: sold-out items are hidden rather than shown as sold out.
+**Consequence.** Toggling availability is the owner's "sold out" switch.

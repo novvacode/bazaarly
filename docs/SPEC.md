@@ -815,11 +815,11 @@ Tick boxes as you go. Each phase ends with green `make test` and `make lint`, up
 - [x] Tests: auth flows, reuse detection, rate limits, tenant isolation harness (§7) in place with the route-enumeration meta-test.
 
 ### Phase 2 — Menu and storefront
-- [ ] Categories, items (soft delete), reorder, image upload, FAQ CRUD.
-- [ ] `GET /public/b/{slug}` with caching and invalidation on menu/tenant changes.
-- [ ] Web: menu management (reorder, availability toggle, images), FAQ page, storefront `/b/[slug]` with cart drawer (localStorage), mobile-first.
-- [ ] Seed script with the two fictional demo tenants.
-- [ ] Tests: CRUD, validation, isolation for all new routes, public payload excludes deleted/unavailable items.
+- [x] Categories, items (soft delete), reorder, image upload, FAQ CRUD.
+- [x] `GET /public/b/{slug}` with caching and invalidation on menu/tenant changes.
+- [x] Web: menu management (reorder, availability toggle, images), FAQ page, storefront `/b/[slug]` with cart drawer (localStorage), mobile-first.
+- [x] Seed script with the two fictional demo tenants.
+- [x] Tests: CRUD, validation, isolation for all new routes, public payload excludes deleted/unavailable items.
 
 ### Phase 3 — Orders (COD) and dashboard
 - [ ] Orders, order_items, order_status_events, outbox tables.
