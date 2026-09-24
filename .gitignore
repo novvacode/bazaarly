@@ -21,3 +21,6 @@ node_modules/
 .DS_Store
 .idea/
 .vscode/
+
+# Local Redis snapshots
+dump.rdb
