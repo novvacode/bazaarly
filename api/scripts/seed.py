@@ -34,6 +34,7 @@ from app.repositories import orders as order_repo
 from app.repositories import tenants as tenant_repo
 from app.repositories import users as user_repo
 from app.schemas.menu import FaqIn, ItemIn
+from app.services import hooks
 from app.services import menu as menu_service
 from scripts.seed_data import ADMIN_EMAIL, ADMIN_PASSWORD, DEMO_PASSWORD, TENANTS
 
@@ -77,6 +78,8 @@ async def seed_tenant(session: AsyncSession, spec: dict[str, Any]) -> tuple[uuid
             await menu_service.create_item(session, ctx, ItemIn(category_id=category.id, **item))
     for question, answer in spec["faq"]:
         await menu_service.create_faq(session, ctx, FaqIn(question=question, answer=answer))
+    await hooks.reindex_tenant(session, tenant.id)  # the worker builds the assistant's index
+    await session.commit()
     return tenant.id, True
 
 

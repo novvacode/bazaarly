@@ -20,6 +20,7 @@ import { formatPaise } from "@/lib/money";
 import type { PublicBusiness, PublicItem, StorefrontOut } from "@/lib/types";
 
 import { MAX_QTY, useCart } from "./cart";
+import { ChatWidget } from "./chat-widget";
 
 export function QtyStepper({
   qty,
@@ -288,6 +289,7 @@ export function Storefront({ data }: { data: StorefrontOut }) {
       )}
 
       <CartSheet business={business} />
+      <ChatWidget slug={business.slug} businessName={business.name} />
     </div>
   );
 }

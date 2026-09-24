@@ -847,13 +847,14 @@ Tick boxes as you go. Each phase ends with green `make test` and `make lint`, up
 - [x] Sequence diagram for order + payment in `docs/architecture.md`; known-limitation note on merchant payouts in `DECISIONS.md`.
 
 ### Phase 6 — AI assistant
-- [ ] kb_chunks and assistant_logs tables with HNSW index.
-- [ ] Indexing handlers wired to menu/FAQ/tenant changes via outbox; content-hash skip; tenant reindex.
-- [ ] Retriever, prompt, `AnthropicClient` + `FakeLLM`, JSON parsing with fallback, session memory, limits, logging.
-- [ ] Public assistant endpoint; owner logs page with unanswered filter, turn-into-FAQ, reindex.
-- [ ] Web: storefront chat widget with source chips.
-- [ ] Eval datasets (~40 items per demo tenant) and `evals/run.py` report per §13.6; first report committed.
-- [ ] Tests: RAG tenant isolation, fallback on no context, parse failure fallback, daily cap, rate limit.
+- [x] kb_chunks and assistant_logs tables with HNSW index.
+- [x] Indexing handlers wired to menu/FAQ/tenant changes via outbox; content-hash skip; tenant reindex.
+- [x] Retriever, prompt, `AnthropicClient` + `FakeLLM`, JSON parsing with fallback, session memory, limits, logging.
+- [x] Public assistant endpoint; owner logs page with unanswered filter, turn-into-FAQ, reindex.
+- [x] Web: storefront chat widget with source chips.
+- [x] Eval datasets (~40 items per demo tenant) and `evals/run.py` report per §13.6.
+- [ ] First eval report committed (needs `ANTHROPIC_API_KEY`; see DECISIONS D-029).
+- [x] Tests: RAG tenant isolation, fallback on no context, parse failure fallback, daily cap, rate limit.
 
 ### Phase 7 — Hardening and deploy
 - [ ] Security headers, CSP (allowing Razorpay), log masking, input limits audit, `pip-audit`/`pnpm audit` in CI.

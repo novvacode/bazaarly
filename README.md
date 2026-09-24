@@ -75,6 +75,18 @@ cloudflared tunnel --url http://localhost:3000
 # webhook URL: https://<random>.trycloudflare.com/api/v1/webhooks/razorpay
 ```
 
+## AI assistant
+
+Each storefront has a chat assistant that answers only from that business's own menu, FAQ
+and details (tenant-scoped retrieval over pgvector, answers from `claude-haiku-4-5` by
+default). The worker keeps the knowledge base in sync as the menu changes.
+
+- Locally without keys: set `LLM_PROVIDER=fake` and `EMBEDDER=fake` in `.env`.
+- Real answers: set `ANTHROPIC_API_KEY` (and keep `EMBEDDER=fastembed`; the model downloads
+  on first use and is baked into the API Docker image).
+- Evals: `make eval t=demo-bakery` writes `api/evals/reports/<date>-demo-bakery.md`
+  (`--fake` checks the harness without API cost).
+
 ## Repository layout
 
 ```

@@ -63,3 +63,14 @@ test("owner to customer to owner: a COD pickup order end to end", async ({ page,
   await expect(shop.getByTestId("tracking-headline")).toContainText("Completed");
   await customer.close();
 });
+
+test("storefront assistant answers from the menu @mobile", async ({ page }) => {
+  await page.goto("/b/demo-bakery");
+  await page.getByRole("button", { name: "Ask a question" }).click();
+  await page.getByLabel("Your question").fill("Is the chocolate truffle cake eggless?");
+  await page.getByRole("button", { name: "Send" }).click();
+  const log = page.getByTestId("chat-log");
+  await expect(log).toContainText("Is the chocolate truffle cake eggless?");
+  // With LLM_PROVIDER=fake the reply quotes the best-matching menu chunk.
+  await expect(log).toContainText("₹650", { timeout: 20_000 });
+});

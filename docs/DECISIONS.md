@@ -163,3 +163,38 @@ checkout disables the option otherwise, and the API rejects `payment_method=onli
 if the worker crashed in between. **Decision.** Apply the effect first (idempotent), then set
 `processed_at` in a separate update. **Consequence.** Crashes cause a harmless re-run, never a
 lost payment.
+
+### D-025 Assistant chunks carry a title
+**Context.** API `sources` must show "item name / FAQ / Business info" (SPEC §13.4) but
+`kb_chunks` (§6.5) has no title. **Decision.** Add `title` to `kb_chunks` (the item name, or
+"FAQ" / "Business info"). **Consequence.** Sources render without extra joins.
+
+### D-026 Content hash includes the embedding model
+**Context.** Re-embedding is skipped when `content_hash` is unchanged (§13.1), but vectors from
+different models are not comparable. **Decision.** Hash `embedder name + text`. **Consequence.**
+Switching `EMBEDDER` (or upgrading the model) re-embeds everything on the next reindex instead
+of silently mixing vector spaces.
+
+### D-027 Grounded output via structured outputs, with defensive parsing kept
+**Context.** SPEC §13.4 asks for JSON `{answer, answered, used_chunk_ids}` parsed defensively.
+**Decision.** Request it with `output_config.format` (JSON schema; supported by the default
+`claude-haiku-4-5`) and still parse defensively (fences, stray text), treating refusals,
+truncation and API errors as "not answered". When the model says `answered: false`, the API
+always returns the exact fallback sentence rather than the model's wording, and `sources` only
+include chunk ids that were actually retrieved. **Consequence.** No invented non-answers reach
+customers; bad output degrades to the fallback, never to an error.
+
+### D-028 Temperature through `extra_body`
+**Context.** SPEC §13.4 sets temperature 0.2. The Anthropic Python SDK 1.x removed sampling
+parameters from `messages.create()`; newer models reject them. **Decision.** Send
+`extra_body={"temperature": 0.2}` only for models that still accept sampling parameters (the
+default Haiku 4.5 does); omit it for models that reject it. **Consequence.** `LLM_MODEL` can be
+switched to a newer model without a code change.
+
+### D-029 First eval report is pending a real run
+**Context.** SPEC §24 Phase 6 asks for a committed first eval report, which needs the real
+embedding model and an Anthropic API key. **Decision.** The harness, both ~40-question datasets
+and a `--fake` mode (used by the test suite to check the harness) are committed; no fake-mode
+report is committed because its numbers don't measure answer quality. **Consequence.** Run
+`make eval t=demo-bakery` and `make eval t=demo-tiffin` with `ANTHROPIC_API_KEY` set after
+`make seed` and one worker pass, then commit `api/evals/reports/*.md`.

@@ -266,3 +266,23 @@ export type DeadJob = {
   traceback: string | null;
   failed_at: string | null;
 };
+
+export type AssistantReply = {
+  answer: string;
+  answered: boolean;
+  sources: { type: "menu_item" | "faq" | "business_info"; title: string }[];
+};
+
+export type AssistantLog = {
+  id: string;
+  session_id: string;
+  question: string;
+  answer: string;
+  answered: boolean;
+  top_score: number | null;
+  latency_ms: number;
+  model: string;
+  created_at: string;
+};
+
+export type AssistantLogList = { items: AssistantLog[]; next_cursor: string | null };

@@ -247,6 +247,39 @@ async def _sales(client: AsyncClient, w: World) -> None:
     assert all(p["orders"] == 0 for p in body["series"])
 
 
+# --- Assistant ---------------------------------------------------------------------------------
+
+
+@case("GET", "/api/v1/assistant/logs")
+async def _assistant_logs(client: AsyncClient, w: World) -> None:
+    res = await client.get("/api/v1/assistant/logs", headers=w.a.headers)
+    assert res.json()["items"] == []
+
+
+@case("POST", "/api/v1/assistant/reindex")
+async def _assistant_reindex(client: AsyncClient, w: World) -> None:
+    # Only ever enqueues work for the caller's own tenant.
+    from sqlalchemy import select
+
+    from app.db import get_sessionmaker
+    from app.models.order import Outbox
+
+    await client.post("/api/v1/assistant/reindex", headers=w.a.headers)
+    async with get_sessionmaker()() as s:
+        jobs = (
+            (await s.execute(select(Outbox).where(Outbox.job_type == "rag.reindex_tenant")))
+            .scalars()
+            .all()
+        )
+    assert [j.payload["tenant_id"] for j in jobs] == [str(w.a.tenant_id)]
+
+
+@case("POST", "/api/v1/assistant/logs/{log_id}/to-faq")
+async def _assistant_to_faq(client: AsyncClient, w: World) -> None:
+    url = f"/api/v1/assistant/logs/{w.b_ids['assistant_log']}/to-faq"
+    await _expect_404(client, w, "POST", url)
+
+
 # --- Harness -----------------------------------------------------------------------------------
 
 
@@ -273,6 +306,12 @@ async def world(client: AsyncClient) -> World:
     w.b_ids["order_code"] = str(order["order"]["code"])
     w.b_ids["order"] = await order_id_by_code(client, b, order["order"]["code"])
     await client.post(f"/api/v1/orders/{w.b_ids['order']}/mark-paid", headers=b.headers)
+    await client.post(
+        f"/api/v1/public/b/{b.slug}/assistant",
+        json={"session_id": "isolation-session", "message": "B question?"},
+    )
+    logs = (await client.get("/api/v1/assistant/logs", headers=b.headers)).json()
+    w.b_ids["assistant_log"] = logs["items"][0]["id"]
     return w
 
 

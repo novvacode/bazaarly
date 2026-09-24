@@ -246,6 +246,7 @@ async def create_order(
 
     status = order_state.initial_status(data.payment_method)
     order_id = uuid.uuid4()
+    tenant_id = tenant.id  # plain value: ORM attributes expire on rollback
     try:
         code = await repo.allocate_code(session, tenant.id)
         order = Order(
@@ -282,7 +283,7 @@ async def create_order(
     except IntegrityError:
         # A concurrent request with the same idempotency key won the race.
         await session.rollback()
-        existing = await repo.get_by_idempotency_key(session, tenant.id, data.idempotency_key)
+        existing = await repo.get_by_idempotency_key(session, tenant_id, data.idempotency_key)
         if existing is None:
             raise
         return await _created_response(session, existing), False

@@ -37,6 +37,7 @@ from app.schemas.auth import (
     TenantBrief,
     UserOut,
 )
+from app.services import hooks
 
 log = structlog.get_logger()
 
@@ -120,6 +121,7 @@ async def signup(session: AsyncSession, data: SignupIn) -> AuthResult:
             session, name=data.business_name, slug=data.slug, email=data.email
         )
         await membership_repo.create(session, user_id=user.id, tenant_id=tenant.id, role=Role.owner)
+        await hooks.tenant_changed(session, tenant.id)  # index business info for the assistant
         await user_repo.touch_login(session, user.id)
         body, refresh, _ = await _issue(session, user, tenant, Role.owner)
         await session.commit()

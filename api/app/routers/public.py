@@ -6,6 +6,11 @@ from fastapi import APIRouter, Depends, Response, status
 
 from app.core.ratelimit import limit_by_ip
 from app.deps import SessionDep
+from app.rag.chat import ask
+from app.rag.embedder import get_embedder
+from app.rag.llm import get_llm
+from app.redis import get_redis
+from app.schemas.assistant import AssistantAskIn, AssistantReplyOut
 from app.schemas.order import (
     OrderCreatedOut,
     OrderCreateIn,
@@ -85,3 +90,16 @@ async def verify_payment(
         data.razorpay_signature,
     )
     return await order_service.public_order(session, public_token)
+
+
+@router.post(
+    "/b/{slug}/assistant",
+    response_model=AssistantReplyOut,
+    summary="Ask the store's assistant (answers only from the store's own menu, FAQ and info)",
+    dependencies=[Depends(limit_by_ip("assistant", 20))],
+)
+async def assistant(slug: str, data: AssistantAskIn, session: SessionDep) -> AssistantReplyOut:
+    tenant = await public_service.resolve_tenant(session, slug)
+    return await ask(
+        session, get_redis(), get_embedder(), get_llm(), tenant, data.session_id, data.message
+    )

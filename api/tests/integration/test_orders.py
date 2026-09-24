@@ -31,7 +31,11 @@ async def _shop(client: AsyncClient, **settings: object) -> tuple[Actor, str, st
 
 
 async def _outbox(session: AsyncSession) -> list[Outbox]:
-    return list((await session.execute(select(Outbox).order_by(Outbox.id))).scalars())
+    """Notification jobs only (assistant indexing jobs are covered in test_assistant)."""
+    result = await session.execute(
+        select(Outbox).where(Outbox.job_type.like("notifications.%")).order_by(Outbox.id)
+    )
+    return list(result.scalars())
 
 
 # --- Creation rules ----------------------------------------------------------------------------
