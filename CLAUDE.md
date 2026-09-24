@@ -7,7 +7,7 @@ Multi-tenant ordering platform for small local businesses (storefront, orders, R
 - `docs/DECISIONS.md` records every deviation or judgement call. Add to it; don't silently diverge from the spec.
 
 ## Current phase
-Phase 1 — Auth, tenants, team. (Update this line when a phase completes.)
+Phase 2 — Menu and storefront. (Update this line when a phase completes.)
 
 ## Working rules
 1. Build one phase at a time. Start each phase by writing a short plan (files + order), then implement.

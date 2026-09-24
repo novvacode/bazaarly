@@ -806,13 +806,13 @@ Tick boxes as you go. Each phase ends with green `make test` and `make lint`, up
 - [x] CI workflow running api and web jobs, green on an empty test suite plus one real health test.
 
 ### Phase 1 — Auth, tenants, team
-- [ ] Models/migrations: users, memberships, refresh_tokens, invites.
-- [ ] Signup/login/refresh/logout/me/switch-tenant per §8, with rotation and reuse detection.
-- [ ] `TenantContext` dependency, `require_role`, repository pattern established.
-- [ ] Tenant settings GET/PATCH, logo upload (§16), team list, invite create/preview/accept, member removal with last-owner guard.
-- [ ] Rate limiter (§17) applied to auth routes.
-- [ ] Web: signup, login, invite acceptance, auth context with silent refresh, dashboard shell with nav, settings page, team page.
-- [ ] Tests: auth flows, reuse detection, rate limits, tenant isolation harness (§7) in place with the route-enumeration meta-test.
+- [x] Models/migrations: users, memberships, refresh_tokens, invites.
+- [x] Signup/login/refresh/logout/me/switch-tenant per §8, with rotation and reuse detection.
+- [x] `TenantContext` dependency, `require_role`, repository pattern established.
+- [x] Tenant settings GET/PATCH, logo upload (§16), team list, invite create/preview/accept, member removal with last-owner guard.
+- [x] Rate limiter (§17) applied to auth routes.
+- [x] Web: signup, login, invite acceptance, auth context with silent refresh, dashboard shell with nav, settings page, team page.
+- [x] Tests: auth flows, reuse detection, rate limits, tenant isolation harness (§7) in place with the route-enumeration meta-test.
 
 ### Phase 2 — Menu and storefront
 - [ ] Categories, items (soft delete), reorder, image upload, FAQ CRUD.

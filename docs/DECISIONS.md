@@ -46,3 +46,35 @@ so after a refresh it wouldn't know which tenant the user was using. **Decision.
 `tenant_id` column to `refresh_tokens`; rotation copies it and `switch-tenant` updates it.
 **Consequence.** Silent refresh keeps the user in the same tenant. If the membership was
 removed, refresh falls back to the user's first remaining membership (or none).
+
+### D-007 Invite acceptance identifies the invitee by email
+**Context.** SPEC §8 says the invitee "sets name + password (or logs in if the email exists)",
+but invites carry no email (§6.1). **Decision.** `POST /auth/invites/{token}/accept` takes
+`{email, password, name?}`: an existing email must present its password; a new email needs a
+name and a password that passes the password policy. A signed-in user can instead send an empty
+body with their bearer token. **Consequence.** One endpoint covers all three cases; invites stay
+shareable links that aren't tied to an address.
+
+### D-008 Common-password list
+**Context.** SPEC §8 asks to reject the top 1,000 common passwords. **Decision.** Ship
+`api/app/core/common_passwords.txt`: the 1,000 most common passwords of 8+ characters from
+SecLists' `10k-most-common.txt` (MIT). Shorter ones are already rejected by the length rule.
+**Consequence.** The list covers passwords that would otherwise pass the length check.
+
+### D-009 Refresh-token reuse detection is strict
+**Context.** Rotation on every use means two tabs refreshing at once could present the same
+token twice. **Decision.** Keep strict family revocation (as specified) and have the web client
+share one in-flight refresh promise across the page. **Consequence.** Replay of any rotated
+token logs every session in that family out, which is the intended theft signal.
+
+### D-010 DTOs keep snake_case on the web
+**Context.** SPEC §26 asks to pick either mapping to camelCase at the API client boundary or
+keeping snake_case in DTO types. **Decision.** Keep snake_case in `web/lib/types.ts`.
+**Consequence.** No mapping layer to maintain; field names match the OpenAPI schema and backend
+tests one-to-one. camelCase is still used for local variables and props.
+
+### D-011 Session bootstrap is lazy
+**Context.** SPEC §8 says the web app calls `POST /auth/refresh` on page load. Most traffic is
+customers on public storefront pages, who never have a session. **Decision.** The refresh runs
+the first time a page that needs the session mounts (`useSession()`: dashboard, admin, auth
+pages, invites). **Consequence.** Storefront and tracking pages make no auth calls.
