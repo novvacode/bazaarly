@@ -21,7 +21,7 @@ const csp = [
   "style-src 'self' 'unsafe-inline'",
   `img-src 'self' data: blob: ${new URL(imageBase).origin} https://*.razorpay.com`,
   "font-src 'self' data:",
-  "connect-src 'self' https://*.razorpay.com https://lumberjack.razorpay.com",
+  "connect-src 'self' https://*.razorpay.com https://lumberjack.razorpay.com https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io",
   "frame-src https://api.razorpay.com https://checkout.razorpay.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",

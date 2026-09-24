@@ -857,12 +857,12 @@ Tick boxes as you go. Each phase ends with green `make test` and `make lint`, up
 - [x] Tests: RAG tenant isolation, fallback on no context, parse failure fallback, daily cap, rate limit.
 
 ### Phase 7 — Hardening and deploy
-- [ ] Security headers, CSP (allowing Razorpay), log masking, input limits audit, `pip-audit`/`pnpm audit` in CI.
-- [ ] Sentry wiring (no-op without DSN); slow-query logging.
-- [ ] Dockerfile finalized (multi-stage, non-root, model pre-download, healthcheck); compose `app` profile used by E2E in CI.
-- [ ] Deployment runbook in README; production env documented; `scripts/create_admin`.
+- [x] Security headers, CSP (allowing Razorpay), log masking, input limits audit, `pip-audit`/`pnpm audit` in CI.
+- [x] Sentry wiring (no-op without DSN); slow-query logging.
+- [x] Dockerfile finalized (multi-stage, non-root, model pre-download, healthcheck); compose `app` profile used by E2E in CI.
+- [x] Deployment runbook in README; production env documented; `scripts/create_admin`.
 - [ ] Deployed to Vercel + Railway on a custom domain; Razorpay test webhook verified end to end; one real test order through each payment method.
-- [ ] README polished: screenshots/GIF, architecture diagram, feature list, "Design decisions" section linking to `DECISIONS.md`, eval results table.
+- [x] README polished: screenshots/GIF, architecture diagram, feature list, "Design decisions" section linking to `DECISIONS.md`, eval results table.
 - [ ] Optional stretch: Postgres RLS (§7.9), SSE for the order board.
 
 ### Phase 8 — Real users (human-led; Claude Code supports with fixes)

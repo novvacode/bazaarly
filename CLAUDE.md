@@ -7,7 +7,7 @@ Multi-tenant ordering platform for small local businesses (storefront, orders, R
 - `docs/DECISIONS.md` records every deviation or judgement call. Add to it; don't silently diverge from the spec.
 
 ## Current phase
-Phase 7 — Hardening and deploy (Phase 6 eval report pending an API key). (Update this line when a phase completes.)
+Phase 7 — deploy pending (needs owner accounts/credentials); Phase 6 eval report pending an API key. (Update this line when a phase completes.)
 
 ## Working rules
 1. Build one phase at a time. Start each phase by writing a short plan (files + order), then implement.
@@ -31,6 +31,7 @@ make dev           # api + worker + web with hot reload
 make test          # backend tests + web lint/typecheck
 make lint / fmt
 make e2e           # Playwright
+make create-admin email=you@example.com
 make eval t=demo-bakery
 ```
 

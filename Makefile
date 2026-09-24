@@ -4,7 +4,7 @@ API := cd api &&
 WEB := cd web &&
 
 .DEFAULT_GOAL := help
-.PHONY: help up down install migrate migration seed api worker web dev test test-api test-web \
+.PHONY: help up down install migrate migration seed create-admin api worker web dev test test-api test-web \
         lint fmt e2e eval audit
 
 help: ## Show this help
@@ -28,6 +28,9 @@ migration: ## Autogenerate a migration: make migration m="add foo"
 
 seed: ## Create platform admin + demo tenants and print credentials
 	$(API) uv run python -m scripts.seed
+
+create-admin: ## Create or promote a platform admin: make create-admin email=you@example.com
+	$(API) uv run python -m scripts.create_admin --email "$(email)"
 
 api: ## Run the API with hot reload
 	$(API) uv run uvicorn app.main:app --reload --port 8000

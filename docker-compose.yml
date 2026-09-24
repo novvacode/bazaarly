@@ -84,6 +84,8 @@ services:
       S3_ENDPOINT_URL: http://minio:9000
       SMTP_HOST: mailpit
     command: python -m app.queue.worker
+    healthcheck:
+      disable: true  # the image's HTTP healthcheck is for the api process
     depends_on:
       api: { condition: service_healthy }
 

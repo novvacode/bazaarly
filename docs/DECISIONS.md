@@ -198,3 +198,15 @@ and a `--fake` mode (used by the test suite to check the harness) are committed;
 report is committed because its numbers don't measure answer quality. **Consequence.** Run
 `make eval t=demo-bakery` and `make eval t=demo-tiffin` with `ANTHROPIC_API_KEY` set after
 `make seed` and one worker pass, then commit `api/evals/reports/*.md`.
+
+### D-030 Request bodies capped at 5 MB before routing
+**Context.** Uvicorn has no body limit; uploads are capped at 2 MB when read, but JSON routes
+and webhooks would otherwise buffer anything. **Decision.** The request middleware rejects a
+declared `Content-Length` over 5 MB with 413 `PAYLOAD_TOO_LARGE`. **Consequence.** Oversized
+requests are refused before any work; chunked uploads are still bounded by the upload reader.
+
+### D-031 Web Sentry is loaded lazily
+**Context.** SPEC §18 wants Sentry for web too, as a no-op without a DSN. **Decision.**
+`instrumentation.ts` / `instrumentation-client.ts` import `@sentry/nextjs` only when
+`SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` is set; the CSP allows Sentry's ingest hosts.
+**Consequence.** No Sentry code runs, and no browser bundle is loaded, without a DSN.

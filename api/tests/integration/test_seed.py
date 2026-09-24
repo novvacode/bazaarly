@@ -42,3 +42,18 @@ async def test_seed_is_usable_and_idempotent(client: AsyncClient, session: Async
         sales = (await client.get("/api/v1/dashboard/sales", headers=headers)).json()
         assert sum(p["orders"] for p in sales["series"]) > 0
     client.cookies.clear()
+
+
+async def test_create_admin_creates_and_promotes(client: AsyncClient) -> None:
+    from scripts.create_admin import create_admin
+    from tests.factories import signup_owner
+
+    assert await create_admin("new.admin@example.com", "New Admin", "long-enough-pass") == "created"
+    owner = await signup_owner(client)
+    assert await create_admin(owner.email, "ignored", None) == "promoted"
+    res = await client.post(
+        "/api/v1/auth/login",
+        json={"email": "new.admin@example.com", "password": "long-enough-pass"},
+    )
+    assert res.json()["user"]["is_platform_admin"] is True
+    client.cookies.clear()

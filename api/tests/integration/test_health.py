@@ -31,3 +31,13 @@ async def test_unknown_route_uses_error_envelope(client: AsyncClient) -> None:
     res = await client.get("/api/v1/nope")
     assert res.status_code == 404
     assert res.json()["error"]["code"] == "NOT_FOUND"
+
+
+async def test_oversized_body_rejected_early(client: AsyncClient) -> None:
+    res = await client.post(
+        "/api/v1/auth/login",
+        content=b"x",
+        headers={"Content-Length": str(6 * 1024 * 1024), "Content-Type": "application/json"},
+    )
+    assert res.status_code == 413
+    assert res.json()["error"]["code"] == "PAYLOAD_TOO_LARGE"

@@ -71,12 +71,14 @@ function OrderCard({ order, onOpen }: { order: OrderSummary; onOpen: () => void 
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({ label, value, text }: { label: string; value: string; text?: boolean }) {
   return (
     <Card className="gap-1 py-4">
       <CardHeader className="px-4">
         <CardDescription>{label}</CardDescription>
-        <CardTitle className="text-2xl tabular-nums">{value}</CardTitle>
+        <CardTitle className={text ? "line-clamp-2 text-base" : "text-2xl tabular-nums"}>
+          {value}
+        </CardTitle>
       </CardHeader>
     </Card>
   );
@@ -164,7 +166,7 @@ export default function OrderBoard() {
         <Stat label="Orders today" value={s ? String(s.orders_total) : "–"} />
         <Stat label="Paid revenue today" value={s ? formatPaise(s.revenue_paise) : "–"} />
         <Stat label="Open orders" value={board.data ? String(open) : "–"} />
-        <Stat label="Top item today" value={s?.top_items[0]?.name ?? "–"} />
+        <Stat label="Top item today" value={s?.top_items[0]?.name ?? "–"} text />
       </div>
 
       {board.isPending ? (

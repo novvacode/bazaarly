@@ -11,6 +11,7 @@ from starlette.types import ASGIApp, Message, Receive, Scope, Send
 log = structlog.get_logger("access")
 
 REQUEST_ID_HEADER = b"x-request-id"
+MAX_BODY_BYTES = 5 * 1024 * 1024  # uploads are capped at 2 MB; nothing legitimate is larger
 
 SECURITY_HEADERS: list[tuple[bytes, bytes]] = [
     (b"x-content-type-options", b"nosniff"),
@@ -40,6 +41,13 @@ class RequestContextMiddleware:
         start = time.perf_counter()
         status = 500
 
+        declared = dict(scope["headers"]).get(b"content-length")
+        if declared is not None and (not declared.isdigit() or int(declared) > MAX_BODY_BYTES):
+            await _reject_too_large(send, request_id)
+            status = 413
+            log.info("request", method=scope.get("method"), route=scope.get("path"), status=413)
+            return
+
         async def send_wrapper(message: Message) -> None:
             nonlocal status
             if message["type"] == "http.response.start":
@@ -63,3 +71,20 @@ class RequestContextMiddleware:
                     status=status,
                     duration_ms=round((time.perf_counter() - start) * 1000, 1),
                 )
+
+
+async def _reject_too_large(send: Send, request_id: str) -> None:
+    body = b'{"error":{"code":"PAYLOAD_TOO_LARGE","message":"Request body too large","details":{}}}'
+    await send(
+        {
+            "type": "http.response.start",
+            "status": 413,
+            "headers": [
+                (b"content-type", b"application/json"),
+                (b"content-length", str(len(body)).encode()),
+                (REQUEST_ID_HEADER, request_id.encode()),
+                *SECURITY_HEADERS,
+            ],
+        }
+    )
+    await send({"type": "http.response.body", "body": body})
