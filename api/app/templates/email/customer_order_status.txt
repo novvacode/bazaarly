@@ -1,0 +1,10 @@
+{{ headline }}
+
+Hi {{ customer_name }}, {{ message }}
+{% if note %}{{ note }}
+{% endif %}
+{% for item in items %}{{ item.quantity }} x {{ item.name }}  {{ item.line_total }}
+{% endfor %}Total  {{ total }}
+
+Track your order: {{ tracking_url }}
+{% if business_phone %}Questions? Call {{ business_name }} at {{ business_phone }}.{% endif %}

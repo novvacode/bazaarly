@@ -116,3 +116,25 @@ machine stays pure and exhaustively tested; all I/O sits in one translation func
 top items for the chart's range. **Decision.** `/dashboard/sales` also returns `top_items` for
 its window. Two separate column charts (revenue, orders) instead of one dual-axis chart.
 **Consequence.** One request per range change; charts follow the dataviz single-axis rule.
+
+### D-018 Why a hand-built queue instead of Celery / RQ / arq / Dramatiq
+**Context.** SPEC §12 asks for a custom queue. **Decision.** Build it on Redis Streams:
+consumer groups give at-least-once delivery and crash recovery (`XPENDING`/`XAUTOCLAIM`), a
+sorted set gives delayed jobs, and three small Lua scripts make the state changes atomic.
+Reasons: (1) learning value and a strong interview story, (2) exact control over the delivery
+semantics (dedupe keys, jittered backoff, dead-letter contents), (3) fewer moving parts — no
+separate broker config, beat process or result backend, and (4) the transactional outbox
+integrates naturally, whereas Celery would still need an outbox to be correct.
+**Consequence.** ~400 lines of queue code we own and test directly (SPEC §12.8 suite). Features
+we don't need (chains, chords, rate-limited queues, priorities) are simply absent.
+
+### D-019 Recovered deliveries count as an attempt
+**Context.** A job whose handler crashes the worker would otherwise be reclaimed forever.
+**Decision.** Reclaimed entries are processed with `attempt + 1`; if that exhausts
+`max_attempts` they go to the dead-letter stream as `WorkerCrashed`. **Consequence.** Poison
+messages end up visible on `/admin` instead of looping.
+
+### D-020 Email in tests and local development
+**Context.** Tests must never call real providers (SPEC §19). **Decision.** `EMAIL_PROVIDER`
+also accepts `memory`, used by tests; local development uses SMTP to Mailpit as specified.
+**Consequence.** Handler tests assert on rendered subject, text and escaped HTML.

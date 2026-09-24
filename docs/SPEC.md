@@ -832,11 +832,11 @@ Tick boxes as you go. Each phase ends with green `make test` and `make lint`, up
 - [x] Playwright E2E scenario from §19 passing.
 
 ### Phase 4 — Job queue and notifications
-- [ ] Queue per §12: envelope, outbox relay, consumers, Lua scripts, scheduler, recovery, cron with locks, graceful shutdown, stats.
-- [ ] Email senders + templates; handlers `order_placed_owner`, `order_status_customer`, `summary.daily`.
-- [ ] Admin endpoints and `/admin` page: stats, dead-letter list, retry, delete.
-- [ ] Tests: all of §12.8.
-- [ ] `docs/architecture.md` section describing the queue with a diagram; `DECISIONS.md` "why not Celery".
+- [x] Queue per §12: envelope, outbox relay, consumers, Lua scripts, scheduler, recovery, cron with locks, graceful shutdown, stats.
+- [x] Email senders + templates; handlers `order_placed_owner`, `order_status_customer`, `summary.daily`.
+- [x] Admin endpoints and `/admin` page: stats, dead-letter list, retry, delete.
+- [x] Tests: all of §12.8.
+- [x] `docs/architecture.md` section describing the queue with a diagram; `DECISIONS.md` "why not Celery".
 
 ### Phase 5 — Online payments
 - [ ] Payments and webhook_events tables; Razorpay client (httpx).

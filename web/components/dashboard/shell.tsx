@@ -125,7 +125,7 @@ function TenantSwitcher() {
 }
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
-  const { status, tenant } = useSession();
+  const { status, tenant, user } = useSession();
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -151,9 +151,16 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
           Your account isn&apos;t a member of any business. Ask an owner for an invite link, or
           create a new store.
         </p>
-        <Button asChild className="mt-4">
-          <Link href="/signup">Create a store</Link>
-        </Button>
+        <div className="mt-4 flex justify-center gap-2">
+          {user?.is_platform_admin && (
+            <Button asChild>
+              <Link href="/admin">Platform admin</Link>
+            </Button>
+          )}
+          <Button asChild variant={user?.is_platform_admin ? "outline" : "default"}>
+            <Link href="/signup">Create a store</Link>
+          </Button>
+        </div>
       </div>
     );
   }

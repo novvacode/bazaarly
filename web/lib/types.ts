@@ -231,3 +231,37 @@ export type SalesOut = {
   series: { date: string; orders: number; revenue_paise: number }[];
   top_items: { name: string; quantity: number; revenue_paise: number }[];
 };
+
+export type AdminTenant = {
+  id: string;
+  name: string;
+  slug: string;
+  email: string | null;
+  accepts_orders: boolean;
+  created_at: string;
+  members: number;
+  orders: number;
+  orders_last_7_days: number;
+};
+
+export type JobStats = {
+  stream_length: number;
+  pending: number;
+  delayed: number;
+  dead: number;
+  consumers: { name: string; pending: number; idle_ms: number }[];
+  counters: Record<string, number>;
+};
+
+export type DeadJob = {
+  entry_id: string;
+  type: string;
+  payload: Record<string, unknown>;
+  attempt: number;
+  job_id: string | null;
+  idempotency_key: string | null;
+  error_type: string | null;
+  error: string | null;
+  traceback: string | null;
+  failed_at: string | null;
+};

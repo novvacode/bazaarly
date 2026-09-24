@@ -1,0 +1,9 @@
+{% extends "_base.html" %}
+{% block heading %}{{ headline }}{% endblock %}
+{% block body %}
+<p style="margin:0 0 8px;">Hi {{ customer_name }}, {{ message }}</p>
+{% if note %}<p style="margin:0 0 8px;padding:8px;background:#f6f4f1;border-radius:6px;">{{ note }}</p>{% endif %}
+{% include "_items.html" %}
+<p style="margin:16px 0 0;"><a href="{{ tracking_url }}" style="display:inline-block;background:#b45309;color:#fff;text-decoration:none;padding:10px 16px;border-radius:8px;">Track your order</a></p>
+{% if business_phone %}<p style="margin:12px 0 0;color:#8a8078;font-size:13px;">Questions? Call {{ business_name }} at {{ business_phone }}.</p>{% endif %}
+{% endblock %}

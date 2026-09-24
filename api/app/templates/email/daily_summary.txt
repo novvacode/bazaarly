@@ -1,0 +1,10 @@
+Today at {{ business_name }} ({{ date_label }})
+
+Orders: {{ orders_total }}
+Paid revenue: {{ revenue }}
+{% for status, count in by_status %}{{ status }}: {{ count }}
+{% endfor %}{% if top_items %}
+Top items:
+{% for item in top_items %}- {{ item.name }} ({{ item.quantity }} sold)
+{% endfor %}{% endif %}
+Dashboard: {{ dashboard_url }}

@@ -1,0 +1,19 @@
+{% extends "_base.html" %}
+{% block heading %}Today at {{ business_name }}: {{ orders_total }} order{{ "" if orders_total == 1 else "s" }}{% endblock %}
+{% block body %}
+<p style="margin:0 0 8px;">Summary for {{ date_label }}.</p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:8px 0 12px;">
+  <tr><td style="padding:4px 0;">Orders</td><td style="text-align:right;font-weight:600;">{{ orders_total }}</td></tr>
+  <tr><td style="padding:4px 0;">Paid revenue</td><td style="text-align:right;font-weight:600;">{{ revenue }}</td></tr>
+  {% for status, count in by_status %}
+  <tr><td style="padding:4px 0;color:#8a8078;">{{ status }}</td><td style="text-align:right;color:#8a8078;">{{ count }}</td></tr>
+  {% endfor %}
+</table>
+{% if top_items %}
+<p style="margin:12px 0 4px;font-weight:600;">Top items</p>
+<ol style="margin:0;padding-left:20px;">
+  {% for item in top_items %}<li>{{ item.name }} — {{ item.quantity }} sold</li>{% endfor %}
+</ol>
+{% endif %}
+<p style="margin:16px 0 0;"><a href="{{ dashboard_url }}" style="display:inline-block;background:#b45309;color:#fff;text-decoration:none;padding:10px 16px;border-radius:8px;">Open dashboard</a></p>
+{% endblock %}

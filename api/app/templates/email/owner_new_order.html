@@ -1,0 +1,10 @@
+{% extends "_base.html" %}
+{% block heading %}New order #{{ code }} · {{ total }}{% endblock %}
+{% block body %}
+<p style="margin:0 0 8px;"><strong>{{ customer_name }}</strong> · {{ customer_phone }}</p>
+<p style="margin:0 0 8px;">{{ fulfillment }}{% if delivery_address %}: {{ delivery_address }}{% if delivery_area %} ({{ delivery_area }}){% endif %}{% endif %}</p>
+<p style="margin:0 0 8px;">Payment: {{ payment }}</p>
+{% if notes %}<p style="margin:0 0 8px;padding:8px;background:#f6f4f1;border-radius:6px;">Note: {{ notes }}</p>{% endif %}
+{% include "_items.html" %}
+<p style="margin:16px 0 0;"><a href="{{ dashboard_url }}" style="display:inline-block;background:#b45309;color:#fff;text-decoration:none;padding:10px 16px;border-radius:8px;">Open in dashboard</a></p>
+{% endblock %}

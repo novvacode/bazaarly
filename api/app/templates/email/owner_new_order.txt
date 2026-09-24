@@ -1,0 +1,12 @@
+New order #{{ code }} · {{ total }}
+
+{{ customer_name }} · {{ customer_phone }}
+{{ fulfillment }}{% if delivery_address %}: {{ delivery_address }}{% if delivery_area %} ({{ delivery_area }}){% endif %}{% endif %}
+Payment: {{ payment }}
+{% if notes %}Note: {{ notes }}
+{% endif %}
+{% for item in items %}{{ item.quantity }} x {{ item.name }}  {{ item.line_total }}
+{% endfor %}{% if delivery_fee %}Delivery  {{ delivery_fee }}
+{% endif %}Total  {{ total }}
+
+Open in dashboard: {{ dashboard_url }}
