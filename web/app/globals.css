@@ -25,7 +25,7 @@
   --border: oklch(0.91 0.01 80);
   --input: oklch(0.91 0.01 80);
   --ring: oklch(0.6 0.12 45);
-  --chart-1: oklch(0.55 0.15 45);
+  --chart-1: #c2410c; /* validated vs light surface (dataviz validator) */
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
@@ -52,6 +52,7 @@
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.6 0.1 50);
+  --chart-1: #e0712f; /* validated vs dark card surface */
 }
 
 @theme inline {

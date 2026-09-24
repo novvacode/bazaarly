@@ -89,3 +89,47 @@ async def add_staff(client: AsyncClient, owner: Actor) -> Actor:
 
 def refresh_cookie(token: str) -> dict[str, str]:
     return {"Cookie": f"bz_refresh={token}"}
+
+
+async def create_item(
+    client: AsyncClient,
+    owner: Actor,
+    name: str = "Test Cake",
+    price_paise: int = 50000,
+    **extra: object,
+) -> str:
+    res = await client.post(
+        "/api/v1/menu/items",
+        headers=owner.headers,
+        json={"name": name, "price_paise": price_paise, **extra},
+    )
+    assert res.status_code == 201, res.text
+    return str(res.json()["id"])
+
+
+def order_body(item_ids: list[str], **overrides: object) -> dict[str, object]:
+    body: dict[str, object] = {
+        "idempotency_key": uuid.uuid4().hex,
+        "items": [{"menu_item_id": i, "quantity": 1} for i in item_ids],
+        "customer_name": "Priya Customer",
+        "customer_phone": "9876543210",
+        "fulfillment_mode": "pickup",
+        "payment_method": "cod",
+    }
+    body.update(overrides)
+    return body
+
+
+async def place_order(
+    client: AsyncClient, slug: str, item_ids: list[str], **overrides: object
+) -> dict[str, object]:
+    res = await client.post(
+        f"/api/v1/public/b/{slug}/orders", json=order_body(item_ids, **overrides)
+    )
+    assert res.status_code == 201, res.text
+    return dict(res.json())
+
+
+async def order_id_by_code(client: AsyncClient, owner: Actor, code: int) -> str:
+    res = await client.get("/api/v1/orders", headers=owner.headers, params={"q": str(code)})
+    return str(next(o["id"] for o in res.json()["items"] if o["code"] == code))

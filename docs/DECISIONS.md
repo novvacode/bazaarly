@@ -96,3 +96,23 @@ moves. **Consequence.** Simpler, accessible drag interactions on mobile.
 **Context.** SPEC §9.1 says the storefront returns "available, non-deleted items".
 **Decision.** Follow it literally: sold-out items are hidden rather than shown as sold out.
 **Consequence.** Toggling availability is the owner's "sold out" switch.
+
+### D-015 Status events keep an optional note
+**Context.** `POST /orders/{id}/transition` accepts `{to_status, reason?}` (SPEC §9.1), but
+`order_status_events` (§6.3) has nowhere to store the reason. **Decision.** Add a nullable
+`note` column. **Consequence.** Cancellation reasons show on the merchant timeline and on the
+customer's tracking page.
+
+### D-016 Effects of the state machine map to outbox jobs
+**Context.** SPEC §10.1 wants `transition(order, to, actor) -> list[Effect]`. **Decision.**
+Effects are `NotifyOwnerNewOrder`, `NotifyCustomerStatus(status)` and `RefundRequired`.
+`services.orders.apply_effects` turns the first two into outbox rows (customer emails only when
+the customer gave an email); `RefundRequired` surfaces as `refund_required` on the order.
+The initial `placed` status also emails the customer a confirmation. **Consequence.** The state
+machine stays pure and exhaustively tested; all I/O sits in one translation function.
+
+### D-017 Analytics top items over the whole range
+**Context.** `/dashboard/summary` returns top items for one day, but the analytics page shows
+top items for the chart's range. **Decision.** `/dashboard/sales` also returns `top_items` for
+its window. Two separate column charts (revenue, orders) instead of one dual-axis chart.
+**Consequence.** One request per range change; charts follow the dataviz single-axis rule.

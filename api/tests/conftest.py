@@ -62,8 +62,9 @@ async def _engine_lifecycle() -> AsyncIterator[None]:
     await close_redis()
 
 
-@pytest.fixture(autouse=True)
-async def _clean_state(_engine_lifecycle: None) -> None:
+@pytest.fixture
+async def clean_state(_engine_lifecycle: None) -> None:
+    """Empty every table and the Redis test DB (autouse for tests/integration)."""
     tables = ", ".join(f'"{t.name}"' for t in Base.metadata.sorted_tables)
     async with get_engine().begin() as conn:
         await conn.execute(text(f"TRUNCATE {tables} RESTART IDENTITY CASCADE"))
@@ -71,7 +72,7 @@ async def _clean_state(_engine_lifecycle: None) -> None:
 
 
 @pytest.fixture
-async def session() -> AsyncIterator[AsyncSession]:
+async def session(clean_state: None) -> AsyncIterator[AsyncSession]:
     async with get_sessionmaker()() as s:
         yield s
 
@@ -102,7 +103,7 @@ def rate_limits_on():  # type: ignore[no-untyped-def]
 
 
 @pytest.fixture
-async def client(app) -> AsyncIterator[AsyncClient]:  # type: ignore[no-untyped-def]
+async def client(app, clean_state: None) -> AsyncIterator[AsyncClient]:  # type: ignore[no-untyped-def]
     transport = ASGITransport(app=app, client=("127.0.0.1", 12345))
     async with AsyncClient(transport=transport, base_url="http://testserver") as c:
         yield c

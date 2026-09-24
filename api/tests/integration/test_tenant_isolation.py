@@ -17,7 +17,7 @@ import pytest
 from httpx import AsyncClient
 
 from app.main import create_app
-from tests.factories import Actor, signup_owner
+from tests.factories import Actor, order_id_by_code, place_order, signup_owner
 
 # Route prefixes that are not tenant-scoped by an access token.
 EXEMPT_PREFIXES = (
@@ -205,6 +205,48 @@ async def _reorder_faq(client: AsyncClient, w: World) -> None:
     await _expect_404(client, w, "POST", "/api/v1/faq/reorder", json={"ids": [w.b_ids["faq"]]})
 
 
+# --- Orders & dashboard ------------------------------------------------------------------------
+
+
+@case("GET", "/api/v1/orders")
+async def _list_orders(client: AsyncClient, w: World) -> None:
+    res = await client.get("/api/v1/orders", headers=w.a.headers)
+    assert res.json()["items"] == []
+    res = await client.get(
+        "/api/v1/orders", headers=w.a.headers, params={"q": w.b_ids["order_code"]}
+    )
+    assert res.json()["items"] == []
+
+
+@case("GET", "/api/v1/orders/{order_id}")
+async def _get_order(client: AsyncClient, w: World) -> None:
+    await _expect_404(client, w, "GET", f"/api/v1/orders/{w.b_ids['order']}")
+
+
+@case("POST", "/api/v1/orders/{order_id}/transition")
+async def _transition(client: AsyncClient, w: World) -> None:
+    url = f"/api/v1/orders/{w.b_ids['order']}/transition"
+    await _expect_404(client, w, "POST", url, json={"to_status": "confirmed"})
+
+
+@case("POST", "/api/v1/orders/{order_id}/mark-paid")
+async def _mark_paid(client: AsyncClient, w: World) -> None:
+    await _expect_404(client, w, "POST", f"/api/v1/orders/{w.b_ids['order']}/mark-paid")
+
+
+@case("GET", "/api/v1/dashboard/summary")
+async def _summary(client: AsyncClient, w: World) -> None:
+    body = (await client.get("/api/v1/dashboard/summary", headers=w.a.headers)).json()
+    assert body["orders_total"] == 0
+    assert body["revenue_paise"] == 0
+
+
+@case("GET", "/api/v1/dashboard/sales")
+async def _sales(client: AsyncClient, w: World) -> None:
+    body = (await client.get("/api/v1/dashboard/sales", headers=w.a.headers)).json()
+    assert all(p["orders"] == 0 for p in body["series"])
+
+
 # --- Harness -----------------------------------------------------------------------------------
 
 
@@ -227,6 +269,10 @@ async def world(client: AsyncClient) -> World:
         "/api/v1/faq", headers=b.headers, json={"question": "B secret?", "answer": "B answer"}
     )
     w.b_ids["faq"] = res.json()["id"]
+    order = await place_order(client, b.slug, [w.b_ids["item"]])
+    w.b_ids["order_code"] = str(order["order"]["code"])
+    w.b_ids["order"] = await order_id_by_code(client, b, order["order"]["code"])
+    await client.post(f"/api/v1/orders/{w.b_ids['order']}/mark-paid", headers=b.headers)
     return w
 
 

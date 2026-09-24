@@ -822,14 +822,14 @@ Tick boxes as you go. Each phase ends with green `make test` and `make lint`, up
 - [x] Tests: CRUD, validation, isolation for all new routes, public payload excludes deleted/unavailable items.
 
 ### Phase 3 — Orders (COD) and dashboard
-- [ ] Orders, order_items, order_status_events, outbox tables.
-- [ ] Pure state machine + exhaustive unit tests (§10.1).
-- [ ] Order creation per §10.3 for COD (idempotency, server-side pricing, codes), tracking endpoint, transitions, mark-paid.
-- [ ] Outbox rows written for notifications (consumed in Phase 4).
-- [ ] Dashboard summary and sales endpoints.
-- [ ] Web: checkout (COD), tracking page, order board with polling and new-order toast, order list with filters/search, order detail with transition buttons, analytics page with charts.
-- [ ] Tests: creation rules, idempotent resubmit, 20 concurrent orders get unique codes, transitions via API, isolation.
-- [ ] Playwright E2E scenario from §19 passing.
+- [x] Orders, order_items, order_status_events, outbox tables.
+- [x] Pure state machine + exhaustive unit tests (§10.1).
+- [x] Order creation per §10.3 for COD (idempotency, server-side pricing, codes), tracking endpoint, transitions, mark-paid.
+- [x] Outbox rows written for notifications (consumed in Phase 4).
+- [x] Dashboard summary and sales endpoints.
+- [x] Web: checkout (COD), tracking page, order board with polling and new-order toast, order list with filters/search, order detail with transition buttons, analytics page with charts.
+- [x] Tests: creation rules, idempotent resubmit, 20 concurrent orders get unique codes, transitions via API, isolation.
+- [x] Playwright E2E scenario from §19 passing.
 
 ### Phase 4 — Job queue and notifications
 - [ ] Queue per §12: envelope, outbox relay, consumers, Lua scripts, scheduler, recovery, cron with locks, graceful shutdown, stats.
